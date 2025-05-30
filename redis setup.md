@@ -60,6 +60,6 @@ redis:latest redis-server /etc/redis/redis.conf
 redis server 컨테이너 내부에 접속하여, redis-cli 를 실행하여 접속
 
 ```bash
-> docker exec -it myredis redis-cli --raw
+> docker exec -it redis redis-cli --raw
 ```
 ※ --raw 옵션은 redis-cli 를 사용할때 한글을 정상적으로 출력하기 위해 사용하는 옵션

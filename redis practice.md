@@ -215,3 +215,7 @@ c) TTL(time to live)
 # TTL 조회
 > TTL fruits
 ```
+
+
+## Set 자료 구조
+- 데이터를 중복, 순서 없이 보관하는 구조

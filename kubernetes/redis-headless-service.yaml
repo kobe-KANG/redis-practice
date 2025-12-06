@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master-replica-headless # Headless Service 이름
+  labels:
+    app: redis-ha
+spec:
+  ports:
+  - port: 6379
+    name: redis-port
+  clusterIP: None # Headless Service의 핵심! Cluster IP를 할당하지 않음
+  selector:
+    app: redis-ha # StatefulSet 파드와 연결

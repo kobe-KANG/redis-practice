@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel-service # 클라이언트가 접속할 서비스 이름
+  labels:
+    app: redis-sentinel-service
+spec:
+  # ClusterIP: 쿠버네티스 클러스터 내부에서만 접근 가능한 고정 IP 할당
+  type: ClusterIP 
+  ports:
+  - port: 26379 # Sentinel의 기본 포트
+    targetPort: 26379
+    protocol: TCP
+  selector:
+    # 이 셀렉터가 Deployment의 파드 레이블과 일치해야 합니다.
+    # Deployment에서 정의한 app: redis-sentinel 레이블을 가진 파드를 찾음
+    app: redis-sentinel

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-sentinel-config
+data:
+  sentinel.conf: |
+    # Sentinel이 감시할 Master 셋 이름과 IP (Headless Service를 통해 접근)
+    # Master는 초기에는 redis-master-replica-0 파드임
+    sentinel monitor mymaster redis-master-replica-0.redis-master-replica-headless 6379 2
+    # '2'는 Quorum (정족수): 2개 이상의 Sentinel이 동의해야 Failover 시작
+    sentinel down-after-milliseconds mymaster 5000
+    sentinel failover-timeout mymaster 60000
+    sentinel parallel-syncs mymaster 1

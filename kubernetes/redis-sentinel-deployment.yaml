@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-sentinel
+spec:
+  replicas: 3 # 최소 3개의 Sentinel 파드
+  selector:
+    matchLabels:
+      app: redis-sentinel
+  template:
+    metadata:
+      labels:
+        app: redis-sentinel
+    spec:
+      containers:
+      - name: sentinel
+        image: redis:7.2-alpine
+        command: ["redis-server", "/usr/local/etc/redis/sentinel.conf", "--sentinel"]
+        ports:
+        - containerPort: 26379 # Sentinel 포트
+        volumeMounts:
+        - name: sentinel-config
+          mountPath: /usr/local/etc/redis
+      volumes:
+      - name: sentinel-config
+        configMap:
+          name: redis-sentinel-config

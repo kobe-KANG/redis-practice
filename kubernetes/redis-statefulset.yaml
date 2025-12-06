@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-master-replica
+spec:
+  serviceName: redis-master-replica-headless
+  replicas: 3 # 최소 3개의 데이터 노드
+  selector:
+    matchLabels:
+      app: redis-ha
+  template:
+    metadata:
+      labels:
+        app: redis-ha
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.2-alpine
+        ports:
+        - containerPort: 6379
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # K8s 파드 이름(hostname)을 기반으로 Master/Replica 역할 분리
+            REDIS_POD_ID=$(hostname | rev | cut -d'-' -f1 | rev);
+            
+            # 모든 파드는 기본 설정으로 시작
+            redis-server /usr/local/etc/redis/redis.conf;
+
+            # 파드 ID가 0이 아니면 (즉, replica-1, replica-2) Master를 바라보도록 설정
+            if [ $REDIS_POD_ID -ne 0 ]; then
+                # 마스터의 고정된 DNS 이름은 'redis-master-replica-headless-0.redis-master-replica-headless'
+                # 하지만, Sentinel이 관리하므로 초기 Master Service 이름을 사용할 수도 있음
+                # 더 안정적인 방법은 Sentinel이 시작된 후 Sentinel에게 맡기는 것이나,
+                # 여기서는 초기 설정을 위해 Master의 안정적인 Service/DNS 이름을 사용함.
+                
+                # Headless Service는 redis-master-replica-headless.default.svc.cluster.local 형식의 DNS를 제공
+                # Master는 redis-master-replica-0.redis-master-replica-headless
+                redis-cli -h 127.0.0.1 replicaof redis-master-replica-0.redis-master-replica-headless 6379;
+            fi
+        # -- 기타 설정 (persistence volume, resource limits 등) --
